@@ -3,3 +3,5 @@ numpy
 pywebview
 streamlit
 tk
+pyinstaller
+keyboard
