@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from src.utils import cm_to_px
-from src.config import START_HOUR, END_HOUR, FONT, FONT_SCALE, FONT_THICKNESS, LINE_COLOR, LINE_THICKNESS, DPI, WIDTH, HEIGHT
+from src.config import FONT, FONT_SCALE, FONT_THICKNESS, LINE_COLOR, LINE_THICKNESS, DPI, WIDTH, HEIGHT
 from datetime import datetime, timedelta
 
 
@@ -23,7 +23,7 @@ def draw_vertical_lines(image):
         cv2.line(image, (x, 0), (x, HEIGHT), LINE_COLOR, LINE_THICKNESS)
 
 
-def draw_horizontal_lines(image):
+def draw_horizontal_lines(image, start_hour, end_hour):
     # Draw top section
     y = top_section_height
     cv2.line(image, (0, y), (WIDTH, y), LINE_COLOR, LINE_THICKNESS)
@@ -34,7 +34,7 @@ def draw_horizontal_lines(image):
     cv2.line(image, (x, y), (WIDTH, y), LINE_COLOR, LINE_THICKNESS)
 
     # Draw leftmost horizontal hour guide marks
-    num_hours = END_HOUR - START_HOUR
+    num_hours = end_hour - start_hour
     for i in range(0, num_hours + 1):
         y = top_section_height + top_gap_height + (i * hour_height)
         x1 = leftmost_section_width - guide_mark_width / 2
@@ -55,16 +55,16 @@ def draw_horizontal_lines(image):
     cv2.line(image, (x, y), (WIDTH, y), LINE_COLOR, LINE_THICKNESS)
 
 
-def draw_hours(image):
+def draw_hours(image, start_hour, end_hour):
     # Calculate text HEIGHT and WIDTH to center text
     (text_width, text_height), baseline = cv2.getTextSize("00:00", FONT, FONT_SCALE, FONT_THICKNESS)
     
-    for i in range(START_HOUR, END_HOUR + 1):
+    for i in range(start_hour, end_hour + 1):
         # Convert hour to h:mm format
         hour_str = f"{str(i).zfill(2)}:00"
         
         # Calculate position
-        y = top_section_height + top_gap_height + (i - START_HOUR) * hour_height + text_height // 2
+        y = top_section_height + top_gap_height + (i - start_hour) * hour_height + text_height // 2
         x = (leftmost_section_width - text_width) // 2
         
         # Draw text
@@ -121,12 +121,12 @@ def draw_year(image, start_date):
     cv2.putText(image, current_year, (x, y), FONT, FONT_SCALE, LINE_COLOR, FONT_THICKNESS)
 
 
-def draw_page(start_date):
+def draw_page(start_hour, end_hour, start_date):
     image = np.ones((HEIGHT, WIDTH, 3), np.uint8) * 255
 
     draw_vertical_lines(image)
-    draw_horizontal_lines(image)
-    draw_hours(image)
+    draw_horizontal_lines(image, start_hour, end_hour)
+    draw_hours(image, start_hour, end_hour)
     draw_days(image, start_date)
     draw_year(image, start_date)
 
